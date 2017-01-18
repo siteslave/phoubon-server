@@ -47,6 +47,8 @@ router.get('/:limit/:offset', function(req, res, next) {
       rows.forEach(v => {
         let obj = {
           id: v.id,
+          lat: v.lat,
+          lng: v.lng,
           first_name: v.first_name,
           last_name: v.last_name,
           telephone: v.telephone,
@@ -86,7 +88,21 @@ router.delete('/:id', function(req, res, next) {
   let id = req.params.id;
 
   Customer.remove(db, id)
-    .then((total) => {
+    .then(() => {
+      res.send({ ok: true });
+    }, (error) => {
+      res.send({ ok: false, error: error });
+    });
+});
+
+router.put('/map/:id', function(req, res, next) {
+  let db = req.db;
+  let id = req.params.id;
+  let lng = req.body.lng;
+  let lat = req.body.lat;
+
+  Customer.saveMap(db, id, lat, lng)
+    .then(() => {
       res.send({ ok: true });
     }, (error) => {
       res.send({ ok: false, error: error });

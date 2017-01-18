@@ -35,6 +35,28 @@ module.exports = {
     });
   },
 
+  saveMap(db, id, lat, lng) {
+    return new Promise((resolve, reject) => {
+      db.getConnection((err, conn) => {
+        if (err) {
+          reject(err);
+        } else {
+          let sql = `
+          UPDATE customers 
+          SET lat=?, lng=?
+          WHERE id=?
+          `;
+          conn.query(sql, [lat, lng, id], (err, rows) => {
+            if (err) reject(err);
+            else resolve(rows);
+          });
+          conn.release();
+        }
+      });
+      
+    });
+  },
+
   total(db) {
     return new Promise((resolve, reject) => {
       db.getConnection((err, conn) => {
