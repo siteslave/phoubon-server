@@ -36,9 +36,12 @@ router.post('/', (req, res, next) => {
 
 });
 
-router.get('/', function(req, res, next) {
+router.get('/:limit/:offset', function(req, res, next) {
   let db = req.db;
-  Customer.all(db)
+  let limit = +req.params.limit;
+  let offset = +req.params.offset;
+
+  Customer.all(db, limit, offset)
     .then((rows) => {
       let customers = [];
       rows.forEach(v => {
@@ -62,6 +65,16 @@ router.get('/customer-types', function(req, res, next) {
   Customer.getCustomerTypes(db)
     .then((rows) => {
       res.send({ ok: true, rows: rows });
+    }, (error) => {
+      res.send({ ok: false, error: error });
+    });
+});
+
+router.get('/total', function(req, res, next) {
+  let db = req.db;
+  Customer.total(db)
+    .then((total) => {
+      res.send({ ok: true, total: total });
     }, (error) => {
       res.send({ ok: false, error: error });
     });

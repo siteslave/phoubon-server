@@ -1,14 +1,32 @@
 module.exports = {
-  all(db) {
+  all(db, limit, offset) {
     return new Promise((resolve, reject) => {
       db.getConnection((err, conn) => {
         if (err) {
           reject(err);
         } else {
-          let sql = `SELECT * FROM customers`;
-          conn.query(sql, [], (err, rows) => {
+          let sql = `SELECT * FROM customers LIMIT ? OFFSET ?`;
+          conn.query(sql, [limit, offset], (err, rows) => {
             if (err) reject(err);
             else resolve(rows);
+          });
+          conn.release();
+        }
+      });
+      
+    });
+  },
+
+  total(db) {
+    return new Promise((resolve, reject) => {
+      db.getConnection((err, conn) => {
+        if (err) {
+          reject(err);
+        } else {
+          let sql = `SELECT COUNT(*) AS total FROM customers`;
+          conn.query(sql, [], (err, rows) => {
+            if (err) reject(err);
+            else resolve(rows[0].total);
           });
           conn.release();
         }
