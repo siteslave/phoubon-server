@@ -38,8 +38,8 @@ router.post('/', (req, res, next) => {
 
 router.get('/:limit/:offset', function(req, res, next) {
   let db = req.db;
-  let limit = +req.params.limit;
-  let offset = +req.params.offset;
+  let limit = parseInt(req.params.limit);
+  let offset = parseInt(req.params.offset);
 
   Customer.all(db, limit, offset)
     .then((rows) => {
