@@ -17,6 +17,24 @@ module.exports = {
     });
   },
 
+  remove(db, id) {
+    return new Promise((resolve, reject) => {
+      db.getConnection((err, conn) => {
+        if (err) {
+          reject(err);
+        } else {
+          let sql = `DELETE FROM customers WHERE id=?`;
+          conn.query(sql, [id], (err, rows) => {
+            if (err) reject(err);
+            else resolve(rows);
+          });
+          conn.release();
+        }
+      });
+      
+    });
+  },
+
   total(db) {
     return new Promise((resolve, reject) => {
       db.getConnection((err, conn) => {
