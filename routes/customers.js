@@ -36,6 +36,42 @@ router.post('/', (req, res, next) => {
 
 });
 
+router.put('/', (req, res, next) => {
+  let first_name = req.body.first_name;
+  let last_name = req.body.last_name;
+  let sex = req.body.sex;
+  let customer_type_id = req.body.customer_type_id;
+  let telephone = req.body.telephone;
+  let email = req.body.email;
+  let image = req.body.image;
+  let id = req.body.id;
+
+  if (first_name && last_name && customer_type_id) {
+    let customer = {
+      first_name: first_name,
+      last_name: last_name,
+      sex: sex,
+      customer_type_id: customer_type_id,
+      telephone: telephone,
+      email: email,
+      image: image,
+      id: id
+    }
+
+    let db = req.db;
+    Customer.update(db, customer)
+      .then(() => {
+        res.send({ ok: true });
+      }, (error) => { 
+        res.send({ ok: false, error: error });
+       });
+
+  } else {
+    res.send({ ok: false, error: 'ข้อมูลไม่ครบถ้วน' });
+  }
+
+});
+
 router.get('/:limit/:offset', function(req, res, next) {
   let db = req.db;
   let limit = parseInt(req.params.limit);
@@ -47,6 +83,8 @@ router.get('/:limit/:offset', function(req, res, next) {
       rows.forEach(v => {
         let obj = {
           id: v.id,
+          sex: v.sex,
+          customer_type_id: v.customer_type_id,
           lat: v.lat,
           lng: v.lng,
           first_name: v.first_name,

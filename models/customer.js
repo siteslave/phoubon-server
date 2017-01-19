@@ -120,5 +120,37 @@ module.exports = {
       });
       
     });
+  },
+
+  update(db, customer) {
+    return new Promise((resolve, reject) => {
+      db.getConnection((err, conn) => {
+        if (err) {
+          reject(err);
+        } else {
+          let sql = `
+          UPDATE customers SET first_name=?, 
+          last_name=?, sex=?, customer_type_id=?, 
+          email=?, telephone=?, image=?
+          WHERE id=?
+          `;
+          conn.query(sql, [
+            customer.first_name,
+            customer.last_name,
+            customer.sex,
+            customer.customer_type_id,
+            customer.email,
+            customer.telephone,
+            customer.image,
+            customer.id
+          ], (err, rows) => {
+            if (err) reject(err);
+            else resolve(rows);
+          });
+          conn.release();
+        }
+      });
+      
+    });
   }
 }
