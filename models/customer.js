@@ -16,6 +16,31 @@ module.exports = {
       
     });
   },
+  
+  search(db, query) {
+    return new Promise((resolve, reject) => {
+      let _query = `%${query}%`;
+      // let _query = '%' + query + '%';
+
+      db.getConnection((err, conn) => {
+        if (err) {
+          reject(err);
+        } else {
+          let sql = `
+          SELECT * 
+          FROM customers
+          WHERE first_name LIKE ? OR last_name LIKE ?
+          `;
+          conn.query(sql, [_query, _query], (err, rows) => {
+            if (err) reject(err);
+            else resolve(rows);
+          });
+          conn.release();
+        }
+      });
+      
+    });
+  },
 
   remove(db, id) {
     return new Promise((resolve, reject) => {

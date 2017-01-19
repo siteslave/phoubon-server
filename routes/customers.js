@@ -101,6 +101,34 @@ router.get('/:limit/:offset', function(req, res, next) {
     });
 });
 
+router.post('/search', function(req, res, next) {
+  let db = req.db;
+  let query = req.body.query;
+
+  Customer.search(db, query)
+    .then((rows) => {
+      let customers = [];
+      rows.forEach(v => {
+        let obj = {
+          id: v.id,
+          sex: v.sex,
+          customer_type_id: v.customer_type_id,
+          lat: v.lat,
+          lng: v.lng,
+          first_name: v.first_name,
+          last_name: v.last_name,
+          telephone: v.telephone,
+          email: v.email,
+          image: v.image ? v.image.toString() : null
+        };
+        customers.push(obj);
+      });
+      res.send({ ok: true, rows: customers });
+    }, (error) => {
+      res.send({ ok: false, error: error });
+    });
+});
+
 router.get('/customer-types', function(req, res, next) {
   let db = req.db;
   Customer.getCustomerTypes(db)
