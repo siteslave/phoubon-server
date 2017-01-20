@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Customer = require('../models/customer');
+var Encrypt = require('../models/encrypt');
 
 router.post('/', (req, res, next) => {
   let first_name = req.body.first_name;
@@ -95,7 +96,11 @@ router.get('/:limit/:offset', function(req, res, next) {
         };
         customers.push(obj);
       });
-      res.send({ ok: true, rows: customers });
+
+      let _customers = JSON.stringify(customers);
+      let encryptedText = Encrypt.encrypt(_customers);
+
+      res.send({ ok: true, data: encryptedText });
     }, (error) => {
       res.send({ ok: false, error: error });
     });
@@ -123,7 +128,12 @@ router.post('/search', function(req, res, next) {
         };
         customers.push(obj);
       });
-      res.send({ ok: true, rows: customers });
+      
+      let _customers = JSON.stringify(customers);
+      let encryptedText = Encrypt.encrypt(_customers);
+
+      res.send({ ok: true, data: encryptedText });
+      
     }, (error) => {
       res.send({ ok: false, error: error });
     });
