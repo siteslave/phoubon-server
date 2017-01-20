@@ -63,10 +63,11 @@ app.use((req, res, next) => {
 
 let authToken = (req, res, next) => {
   var token = req.headers['x-access-token'];
-  console.log(req.headers);
+  // console.log(req.headers);
   jwt.verify(token)
     .then((decoded) => {
       req.decoded = decoded;
+      console.log(req.decoded);
       next();
     }, err => {
       return res.send({
@@ -94,7 +95,7 @@ app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
+  console.log(err);
   // render the error page
   res.status(err.status || 500);
   res.render('error');

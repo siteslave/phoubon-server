@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var Customer = require('../models/customer');
 var Encrypt = require('../models/encrypt');
+var User = require('../models/users');
 
 router.post('/', (req, res, next) => {
   let first_name = req.body.first_name;
@@ -27,13 +28,28 @@ router.post('/', (req, res, next) => {
     Customer.save(db, customer)
       .then(() => {
         res.send({ ok: true });
-      }, (error) => { 
+      }, (error) => {
         res.send({ ok: false, error: error });
-       });
+      });
 
   } else {
     res.send({ ok: false, error: 'ข้อมูลไม่ครบถ้วน' });
   }
+
+});
+
+router.post('/save-device-token', (req, res, next) => {
+  let id = req.decoded.id;
+  let deviceToken = req.body.deviceToken;
+
+  let db = req.db;
+
+  User.saveDeviceToken(db, id, deviceToken)
+    .then(() => {
+      res.send({ ok: true });
+    }, (error) => {
+      res.send({ ok: false, error: error });
+    });
 
 });
 
@@ -63,9 +79,9 @@ router.put('/', (req, res, next) => {
     Customer.update(db, customer)
       .then(() => {
         res.send({ ok: true });
-      }, (error) => { 
+      }, (error) => {
         res.send({ ok: false, error: error });
-       });
+      });
 
   } else {
     res.send({ ok: false, error: 'ข้อมูลไม่ครบถ้วน' });
@@ -73,7 +89,7 @@ router.put('/', (req, res, next) => {
 
 });
 
-router.get('/:limit/:offset', function(req, res, next) {
+router.get('/:limit/:offset', function (req, res, next) {
   let db = req.db;
   let limit = parseInt(req.params.limit);
   let offset = parseInt(req.params.offset);
@@ -106,7 +122,7 @@ router.get('/:limit/:offset', function(req, res, next) {
     });
 });
 
-router.post('/search', function(req, res, next) {
+router.post('/search', function (req, res, next) {
   let db = req.db;
   let query = req.body.query;
 
@@ -128,18 +144,18 @@ router.post('/search', function(req, res, next) {
         };
         customers.push(obj);
       });
-      
+
       let _customers = JSON.stringify(customers);
       let encryptedText = Encrypt.encrypt(_customers);
 
       res.send({ ok: true, data: encryptedText });
-      
+
     }, (error) => {
       res.send({ ok: false, error: error });
     });
 });
 
-router.get('/customer-types', function(req, res, next) {
+router.get('/customer-types', function (req, res, next) {
   let db = req.db;
   Customer.getCustomerTypes(db)
     .then((rows) => {
@@ -149,7 +165,7 @@ router.get('/customer-types', function(req, res, next) {
     });
 });
 
-router.get('/total', function(req, res, next) {
+router.get('/total', function (req, res, next) {
   let db = req.db;
   Customer.total(db)
     .then((total) => {
@@ -159,7 +175,7 @@ router.get('/total', function(req, res, next) {
     });
 });
 
-router.delete('/:id', function(req, res, next) {
+router.delete('/:id', function (req, res, next) {
   let db = req.db;
   let id = req.params.id;
 
@@ -171,7 +187,7 @@ router.delete('/:id', function(req, res, next) {
     });
 });
 
-router.put('/map/:id', function(req, res, next) {
+router.put('/map/:id', function (req, res, next) {
   let db = req.db;
   let id = req.params.id;
   let lng = req.body.lng;
