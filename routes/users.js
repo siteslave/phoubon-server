@@ -4,17 +4,23 @@ var router = express.Router();
 let crypto = require('crypto');
 let User = require('../models/users');
 let jwt = require('../models/jwt');
+let Encrypt = require('../models/encrypt');
 
 // POST /users/login
 router.post('/login', function(req, res, next) {
-  let username = req.body.username;
-  let password = req.body.password;
+  let data = req.body.data;
   let db = req.db;
 
+  let decryptedData = Encrypt.decrypt(data);
+  let user = JSON.parse(decryptedData);
+
+  // console.log(data);
+  // console.log(user);
+
   let hashPassword = crypto.createHash('md5')
-    .update(password).digest('hex');
+    .update(user.password).digest('hex');
   
-  User.doLogin(db, username, hashPassword)
+  User.doLogin(db, user.username, hashPassword)
     .then(rows => {
       // console.log(rows.length);
       if (rows.length) {
