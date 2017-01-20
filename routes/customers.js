@@ -1,4 +1,6 @@
 var express = require('express');
+var gcm = require('node-gcm');
+      
 var router = express.Router();
 var Customer = require('../models/customer');
 var Encrypt = require('../models/encrypt');
@@ -50,7 +52,56 @@ router.post('/save-device-token', (req, res, next) => {
     }, (error) => {
       res.send({ ok: false, error: error });
     });
+});
 
+router.post('/send-message', (req, res, next) => {
+  let id = req.body.id;
+  let msg = req.body.msg;
+
+  let db = req.db;
+
+  User.getDeviceToken(db, id)
+    .then((rows) => {
+
+      var message = new gcm.Message();
+      message.addData('title', 'ข้อความจาก สสจ.');
+      message.addData('message', msg);
+      message.addData('content-available', true);
+      // message.addData('data', { "username": "Satit", "message": "Hello world" });
+      message.addData('image', 'http://www.pro.moph.go.th/w54/images/ICT/loadlogomoph.png');
+
+      // Set up the sender with you API key, prepare your recipients' registration tokens. 
+      var sender = new gcm.Sender("AAAA7_Hcufg:APA91bHNGtiNs5YDZoagvsjGG7AAMekXG3QB8IgZpPp78COk-PQ78AOEbIWtyBB08tSQs4iw84ob10Ps39PNbamP-OaDk3IlhcSUhw2wBf_6rzXzeWF8b-DYXDdYtOLpDV28412uPj-o");
+      var regTokens = [];
+
+      rows.forEach(v => {
+        regTokens.push(v.device_token);
+      });
+
+      sender.send(message, { registrationTokens: regTokens }, function (err, response) {
+        if (err) {
+          console.error(err);
+          res.send({ ok: false, error: err });
+        } else {
+          console.log(response);
+          res.send({ ok: true });
+        }
+      });
+
+    }, (error) => {
+      res.send({ ok: false, error: error });
+    });
+});
+
+router.get('/users-list', (req, res, next) => {
+  let db = req.db;
+
+  User.getUsers(db)
+    .then((rows) => {
+      res.send({ ok: true, rows: rows });
+    }, (error) => {
+      res.send({ ok: false, error: error });
+    });
 });
 
 router.put('/', (req, res, next) => {
